@@ -24,7 +24,7 @@ function App() {
           <div className="flex flex-col h-screen">
             <NavigationBar />
             {/* Introducing min-h-0 is necessary to prevent children from exceeding flex-grow's height */}
-            <div className="dark:bg-gray-800 dark:text-white flex-grow">
+            <div className="bg-amber-50 dark:bg-gray-800 dark:text-white flex-grow">
               <Routes>
                 <Route element={<Home />} path="/" index />
                 <Route element={<Game />} path="/game" />

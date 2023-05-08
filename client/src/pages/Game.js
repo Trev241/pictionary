@@ -5,6 +5,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { UserContext } from "../components/UserProvider";
 import "./Game.css";
 import Canvas from "../components/Canvas";
+import Modal from "../components/Modal";
 
 function Game() {
   const [messages, setMessages] = useState([]);
@@ -122,24 +123,27 @@ function Game() {
 
   return (
     <div className="grid grid-cols-12 h-full gap-1">
-      <div className="lg:col-span-9 max-lg:col-span-12 flex flex-col justify-center p-2">
-        <h1 className="text-3xl text-center font-bold tracking-widest">
-          {gameState === "GAME_WAITING"
-            ? "WAITING FOR PLAYERS"
-            : isDrawing
-            ? word.toUpperCase()
-            : word
-                .split("")
-                .map(() => "_")
-                .join("")}
-        </h1>
-        <div className="grid grid-cols-2 mb-3">
-          <h1 className="my-auto">
-            <span className="font-semibold">Alice</span> is now drawing
-          </h1>
-          <h1 className="my-auto ms-auto tracking-widest">00:00</h1>
-        </div>
+      {!user && <Modal />}
+      <div className="lg:col-span-9 max-lg:col-span-12 flex flex-col justify-center p-3">
         <div className="relative z-0">
+          <div className="bg-amber-100 dark:bg-gray-900 p-4 rounded-t-2xl">
+            <h1 className="text-3xl text-center font-bold tracking-widest">
+              {gameState === "GAME_WAITING"
+                ? "WAITING FOR PLAYERS"
+                : isDrawing
+                ? word.toUpperCase()
+                : word
+                    .split("")
+                    .map(() => "_")
+                    .join("")}
+            </h1>
+            <div className="grid grid-cols-2 mb-3">
+              <h1 className="my-auto">
+                <span className="font-semibold">Alice</span> is now drawing
+              </h1>
+              <h1 className="my-auto ms-auto tracking-widest">00:00</h1>
+            </div>
+          </div>
           <Canvas enabled={isDrawing} />
           {gameState === "GAME_WAITING" && (
             <div className="absolute inset-0 flex justify-center items-center rounded-2xl bg-black bg-opacity-60 z-50">
@@ -156,8 +160,8 @@ function Game() {
           {players.map((player, idx) => (
             <div
               key={idx}
-              className="w-44 bg-gray-300 dark:bg-gray-900 p-4 rounded-2xl m-1 flex-grow flex items-center shadow-md"
-              // style={{ flexBasis: idx < 3 ? "30%" : "auto" }}
+              className="w-44 bg-amber-300 dark:bg-gray-900 p-4 rounded-2xl m-1 flex-grow flex items-center shadow-md"
+              style={{ flexBasis: idx < 3 ? "30%" : "auto" }}
             >
               {ordinalSuffixOf(idx + 1)}
               &nbsp;&nbsp;
@@ -168,16 +172,16 @@ function Game() {
         </div>
       </div>
 
-      <div className="lg:col-span-3 max-lg:col-span-12 flex items-center bg-gray-300 dark:bg-gray-900">
-        <div className="flex flex-col flex-1 justify-end h-screen max-h-screen max-lg:max-h-96 max-w-full overflow-y-auto bg-gray-200 dark:bg-gray-800 m-3 rounded-xl">
+      <div className="lg:col-span-3 max-lg:col-span-12 flex">
+        <div className="flex flex-col flex-1 justify-end h-screen max-h-screen max-lg:max-h-96 max-w-full overflow-y-auto bg-amber-100 dark:bg-gray-900 m-3 rounded shadow-md">
           <div className="overflow-y-auto max-h-full px-3 my-4">
             <ul className="flex flex-col justify-end">
               {messages.map((message, idx) => (
                 <li
                   key={idx}
                   className={`flex break-words ${message.style} ${
-                    idx % 2 && ""
-                  } px-4 py-2 mb-2 border border-x-0 border-t-0 border-gray-700`}
+                    idx % 2 && "bg-amber-200 dark:bg-gray-800"
+                  } px-4 py-2 mb-3 border border-x-0 border-t-0 border-amber-200 dark:border-gray-800`}
                 >
                   <div className="max-w-full break-words">
                     <span className="font-semibold">

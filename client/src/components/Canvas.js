@@ -120,7 +120,7 @@ function Canvas({ aspectRatio, enabled }) {
   }, [lastJsonMessage, canvasRef]);
 
   return (
-    <div className="bg-gray-300 dark:bg-gray-900 p-4 rounded-2xl shadow-lg">
+    <div className="bg-amber-100 dark:bg-gray-900 p-4 rounded-b-2xl shadow-lg">
       <div id="canvas-container" className="mb-2">
         <canvas ref={ref} className="border border-gray-500 rounded-2xl" />
       </div>
@@ -143,7 +143,7 @@ function Canvas({ aspectRatio, enabled }) {
         <div className="flex flex-grow items-center mb-2 p-6 dark:bg-gray-800 rounded-xl me-4">
           <div>Brush Width</div>
           <input
-            className="bg-gray-300 dark:bg-gray-800"
+            className="bg-transparent dark:bg-gray-800"
             type="range"
             min="5"
             max="100"

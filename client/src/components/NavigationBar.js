@@ -14,14 +14,14 @@ function NavigationBar() {
   };
 
   return (
-    <nav className="bg-gray-900 text-white border-b border-gray-800 shadow-md p-5">
+    <nav className="bg-yellow-400 border-yellow-500 dark:bg-gray-900 dark:text-white border-b dark:border-gray-800 shadow-md p-5">
       <div className="flex">
         <h1 className="flex items-center text-2xl tracking-wide hover:cursor-pointer">
           <Link to="/">Pictionary</Link>
         </h1>
         <div className="ms-auto">
           <Button
-            customStyle="bg-gray-100 hover:bg-gray-300 text-black dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white p-2 text-xl rounded shadow-md"
+            customStyle="bg-amber-600 hover:bg-amber-500 text-white dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white p-2 text-xl rounded shadow-md"
             onClickCallback={handleClick}
           >
             {theme === LIGHT && <BsSunFill />}
