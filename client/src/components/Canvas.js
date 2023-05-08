@@ -94,13 +94,27 @@ function Canvas({ aspectRatio, enabled }) {
 
   return (
     <div>
-      <div id="canvas-container" className="">
+      <div id="canvas-container" className="mb-2">
         <canvas ref={ref} className="border border-gray-500 rounded-2xl" />
       </div>
 
-      <div className={`${!enabled && "invisibl"}`}>
-        <div className="mt-6 font-semibold">
-          Slide to adjust brush width
+      <div
+        className={`flex flex-wrap justify-evenly ${!enabled && "invisibl"}`}
+      >
+        <div className="w-96 me-4">
+          <div className="flex flex-wrap mb-2">
+            {Object.keys(colors).map((className, idx) => (
+              <button
+                className={`rounded p-5 border border-gray-600 dark:border-gray-900 hover:rounded-xl ${className}`}
+                onClick={() =>
+                  (canvasRef.current.freeDrawingBrush.color = colors[className])
+                }
+              />
+            ))}
+          </div>
+        </div>
+        <div className="flex flex-grow items-center mb-2 p-6 border dark:border-gray-900 rounded-xl me-4">
+          <div>Brush Width</div>
           <input
             className="dark:bg-gray-800"
             type="range"
@@ -114,54 +128,12 @@ function Canvas({ aspectRatio, enabled }) {
             }
           />
         </div>
-        <div className="flex flex-wrap align-middle w-full justify-between">
-          <div className="flex flex-col">
-            <div className="flex justify-evenly">
-              {Object.keys(colors)
-                .slice(0, 8)
-                .map((tailwindClass) => (
-                  <button
-                    className={`w-8 h-8 m-1 rounded border border-gray-500 ${tailwindClass}`}
-                    onClick={() =>
-                      (canvasRef.current.freeDrawingBrush.color =
-                        colors[tailwindClass])
-                    }
-                  />
-                ))}
-            </div>
-            <div className="flex justify-evenly">
-              {Object.keys(colors)
-                .slice(8)
-                .map((tailwindClass) => (
-                  <button
-                    className={`w-8 h-8 m-1 rounded border border-gray-500 ${tailwindClass}`}
-                    onClick={() =>
-                      (canvasRef.current.freeDrawingBrush.color =
-                        colors[tailwindClass])
-                    }
-                  />
-                ))}
-            </div>
-            <div className="flex items-center font-semibold">
-              Click
-              <input
-                type="color"
-                className="mx-2 dark:bg-gray-800"
-                onChange={(e) =>
-                  (canvasRef.current.freeDrawingBrush.color = e.target.value)
-                }
-              />
-              to select from more colors
-            </div>
-          </div>
-          <button
-            className="bg-red-600 hover:bg-red-800 p-2 px-2 rounded text-white"
-            onClick={() => sendJsonMessage({ type: "CANVAS_CLEAR" })}
-          >
-            <MdClear className="text-6xl" />
-            Clear
-          </button>
-        </div>
+        <button
+          className="bg-red-600 hover:bg-red-800 p-2 rounded text-white mb-2"
+          onClick={() => sendJsonMessage({ type: "CANVAS_CLEAR" })}
+        >
+          <MdClear className="text-6xl" />
+        </button>
       </div>
     </div>
   );
