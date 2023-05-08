@@ -13,18 +13,7 @@ function Game() {
   const [word, setWord] = useState("");
   const [gameState, setGameState] = useState("GAME_WAITING");
   const [isDrawing, setIsDrawing] = useState(false);
-  const [players, setPlayers] = useState([
-    "Trev",
-    "Vert",
-    "Cow",
-    "Dog",
-    "Car",
-    "Scooter",
-    "Neeko",
-    "Karma",
-    "Wilson",
-    "Willow",
-  ]);
+  const [players, setPlayers] = useState([]);
 
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -54,7 +43,7 @@ function Game() {
 
   // Join room
   useEffect(() => {
-    if (readyState !== WebSocket.OPEN) return;
+    if (readyState !== WebSocket.OPEN || !user) return;
 
     sendJsonMessage({
       type: "ROOM_JOIN",
@@ -83,6 +72,11 @@ function Game() {
           ...messages,
           { text: "A new word has been chosen." },
         ]);
+        setPlayers((players) => {
+          players.forEach((player) => (player.isDrawing = false));
+          players[lastJsonMessage.drawer].isDrawing = true;
+          return players;
+        });
         break;
       case "GAME_START":
         setGameState("GAME_ONGOING");
@@ -98,6 +92,10 @@ function Game() {
         break;
       case "GAME_END_TURN":
         setIsDrawing(false);
+        break;
+      case "ROOM_MEMBER_JOIN":
+      case "ROOM_MEMBER_LEAVE":
+        setPlayers(lastJsonMessage.players);
         break;
       default:
         console.warn(`Received unknown message type ${lastJsonMessage.type}`);
@@ -139,7 +137,11 @@ function Game() {
             </h1>
             <div className="grid grid-cols-2 mb-3">
               <h1 className="my-auto">
-                <span className="font-semibold">Alice</span> is now drawing
+                <span className="font-semibold">
+                  {players.filter((player) => player.isDrawing)[0]?.name ||
+                    "No one"}
+                </span>{" "}
+                is now drawing
               </h1>
               <h1 className="my-auto ms-auto tracking-widest">00:00</h1>
             </div>
@@ -160,13 +162,15 @@ function Game() {
           {players.map((player, idx) => (
             <div
               key={idx}
-              className="w-44 bg-amber-300 dark:bg-gray-900 p-4 rounded-2xl m-1 flex-grow flex items-center shadow-md"
+              className={`w-44 bg-amber-300 dark:bg-gray-900 p-4 rounded-2xl m-1 flex-grow flex items-center shadow-md ${
+                player.isDrawing && "bg-amber-500 dark:bg-green-600"
+              }`}
               style={{ flexBasis: idx < 3 ? "30%" : "auto" }}
             >
               {ordinalSuffixOf(idx + 1)}
               &nbsp;&nbsp;
-              <span className="text-xl overflow-hidden">{player}</span>
-              <span className="ms-auto">43</span>
+              <span className="text-xl overflow-hidden">{player.name}</span>
+              <span className="ms-auto">{player.score}</span>
             </div>
           ))}
         </div>

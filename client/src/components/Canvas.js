@@ -109,6 +109,7 @@ function Canvas({ aspectRatio, enabled }) {
       case "CANVAS_UPDATE":
         canvasRef.current.loadFromJSON(lastJsonMessage.canvas);
         break;
+      case "GAME_NEXT_WORD":
       case "CANVAS_CLEAR":
         canvasRef.current.clear();
         canvasRef.current.backgroundColor = "white";

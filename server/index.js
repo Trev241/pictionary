@@ -7,7 +7,9 @@ let rooms = {};
 
 // Listen for new connections
 wss.on("connection", (ws) => {
-  console.log(`Client connected. Total number of connections: ${wss.clients.size}`);
+  console.log(
+    `Client connected. Total number of connections: ${wss.clients.size}`
+  );
 
   // Listen for messages from the client
   ws.on("message", (message) => {
@@ -18,13 +20,15 @@ wss.on("connection", (ws) => {
       case "ROOM_CREATE":
         const room = new Room();
         rooms[room.id] = room;
-        ws.send(JSON.stringify({
-          type: "ROOM_CREATE_SUCCESS",
-          id: room.id
-        }));
-        console.log(`Created room ${room.id}`)
+        ws.send(
+          JSON.stringify({
+            type: "ROOM_CREATE_SUCCESS",
+            id: room.id,
+          })
+        );
+        console.log(`Created room ${room.id}`);
         break;
-        
+
       case "ROOM_LEAVE":
         rooms[message.id].leave(ws);
         break;
@@ -32,6 +36,7 @@ wss.on("connection", (ws) => {
       case "ROOM_JOIN":
         const reply = {};
         try {
+          ws.handle = message.name;
           rooms[message.id].join(ws);
           reply.type = "ROOM_JOIN_SUCCESS";
         } catch (err) {
@@ -56,13 +61,14 @@ wss.on("connection", (ws) => {
 
   // Listen for disconnections
   ws.on("close", () => {
-    console.log(`Client disconnected. Existing connections: ${wss.clients.size}`);
-    if (ws.roomId && rooms[ws.roomId])
-      rooms[ws.roomId].leave(ws);
+    console.log(
+      `Client disconnected. Existing connections: ${wss.clients.size}`
+    );
+    if (ws.roomId && rooms[ws.roomId]) rooms[ws.roomId].leave(ws);
   });
 });
 
-wss.broadcast = (message, filter = (() => true)) => {
+wss.broadcast = (message, filter = () => true) => {
   Array.from(wss.clients)
     .filter(filter)
     .forEach((client) => {
