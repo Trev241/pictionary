@@ -6,10 +6,13 @@ import { UserContext } from "../components/UserProvider";
 
 function Home() {
   const { user, setUser } = useContext(UserContext);
-  const { lastJsonMessage, sendJsonMessage } = useWebSocket("ws://localhost:8080", {
-    share: true,
-  });
-  
+  const { lastJsonMessage, sendJsonMessage } = useWebSocket(
+    "ws://localhost:8080",
+    {
+      share: true,
+    }
+  );
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,21 +35,23 @@ function Home() {
 
   const handleCreate = async () => {
     // ws.current.send(JSON.stringify({ type: "ROOM_CREATE" }));
-    sendJsonMessage({ type: "ROOM_CREATE"});
+    sendJsonMessage({ type: "ROOM_CREATE" });
   };
 
   return (
     <div className="flex justify-center items-center min-h-screen">
       <div>
-        <h1 className="text-3xl font-bold mb-12">What name would you like to go by?</h1>
+        <h1 className="text-3xl font-bold mb-12">
+          What name would you like to go by?
+        </h1>
 
         <div className="flex flex-col">
-          <input 
-            className="mb-8 text-center block w-full p-4 border border-gray-500 rounded"
-            type="text" 
-            value={user} 
+          <input
+            className="mb-8 text-center block w-full p-4 border border-gray-500 rounded dark:text-black"
+            type="text"
+            value={user}
             placeholder="cool quirky name"
-            onChange={(e) => setUser(e.target.value)} 
+            onChange={(e) => setUser(e.target.value)}
           />
           <button
             className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mb-2"
