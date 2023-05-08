@@ -2,12 +2,16 @@ import { useCallback, useEffect, useRef } from "react";
 import useFabric from "../hooks/useFabric";
 import { useWebSocket } from "react-use-websocket/dist/lib/use-websocket";
 import { MdClear } from "react-icons/md";
+import { fabric } from "fabric";
 
 function Canvas({ aspectRatio, enabled }) {
   const canvasRef = useRef(null);
-  const { sendJsonMessage } = useWebSocket("ws://localhost:8080", {
-    share: true,
-  });
+  const { lastJsonMessage, sendJsonMessage } = useWebSocket(
+    "ws://localhost:8080",
+    {
+      share: true,
+    }
+  );
 
   const colors = {
     "bg-black": "#000000",
@@ -29,18 +33,23 @@ function Canvas({ aspectRatio, enabled }) {
   };
 
   if (!aspectRatio) aspectRatio = 16.0 / 9.0;
+  if (canvasRef.current) canvasRef.current.isDrawingMode = enabled;
 
   const ref = useFabric(
     useCallback(
       (fabricCanvas) => {
+        fabric.Object.prototype.selectable = false;
+        fabric.Object.prototype.hoverCursor = "default";
+
         const containerWidth =
           document.getElementById("canvas-container").offsetWidth;
         fabricCanvas.setWidth(containerWidth);
         fabricCanvas.setHeight(containerWidth / aspectRatio);
 
         fabricCanvas.backgroundColor = "white";
-        fabricCanvas.isDrawingMode = true;
+        fabricCanvas.isDrawingMode = enabled;
         fabricCanvas.freeDrawingBrush.width = 10;
+        fabricCanvas.selection = false;
         fabricCanvas.on("mouse:up", () =>
           sendJsonMessage({
             type: "CANVAS_UPDATE",
@@ -49,7 +58,7 @@ function Canvas({ aspectRatio, enabled }) {
         );
         canvasRef.current = fabricCanvas;
       },
-      [sendJsonMessage]
+      [sendJsonMessage, aspectRatio, enabled]
     )
   );
 
@@ -92,14 +101,32 @@ function Canvas({ aspectRatio, enabled }) {
     return () => window.removeEventListener("resize", resizeCanvas);
   }, []);
 
+  // Listen for canvas events
+  useEffect(() => {
+    if (!canvasRef || !lastJsonMessage) return;
+
+    switch (lastJsonMessage.type) {
+      case "CANVAS_UPDATE":
+        canvasRef.current.loadFromJSON(lastJsonMessage.canvas);
+        break;
+      case "CANVAS_CLEAR":
+        canvasRef.current.clear();
+        canvasRef.current.backgroundColor = "white";
+        break;
+      default:
+        console.warn(`Received unknown message type ${lastJsonMessage.type}`);
+        break;
+    }
+  }, [lastJsonMessage, canvasRef]);
+
   return (
-    <div>
+    <div className="bg-gray-300 dark:bg-gray-900 p-4 rounded-2xl shadow-lg">
       <div id="canvas-container" className="mb-2">
         <canvas ref={ref} className="border border-gray-500 rounded-2xl" />
       </div>
 
       <div
-        className={`flex flex-wrap justify-evenly ${!enabled && "invisibl"}`}
+        className={`flex flex-wrap justify-evenly ${!enabled && "invisible"}`}
       >
         <div className="w-96 me-4">
           <div className="flex flex-wrap mb-2">
@@ -113,10 +140,10 @@ function Canvas({ aspectRatio, enabled }) {
             ))}
           </div>
         </div>
-        <div className="flex flex-grow items-center mb-2 p-6 border dark:border-gray-900 rounded-xl me-4">
+        <div className="flex flex-grow items-center mb-2 p-6 dark:bg-gray-800 rounded-xl me-4">
           <div>Brush Width</div>
           <input
-            className="dark:bg-gray-800"
+            className="bg-gray-300 dark:bg-gray-800"
             type="range"
             min="5"
             max="100"
@@ -129,7 +156,7 @@ function Canvas({ aspectRatio, enabled }) {
           />
         </div>
         <button
-          className="bg-red-600 hover:bg-red-800 p-2 rounded text-white mb-2"
+          className="bg-red-600 hover:bg-red-800 p-2 rounded-xl text-white mb-2"
           onClick={() => sendJsonMessage({ type: "CANVAS_CLEAR" })}
         >
           <MdClear className="text-6xl" />
