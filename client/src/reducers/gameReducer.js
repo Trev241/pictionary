@@ -36,9 +36,19 @@ function gameReducer(state, action) {
       };
     case "ROOM_MEMBER_JOIN":
     case "ROOM_MEMBER_LEAVE":
+      const message = {
+        text: `${action.payload.player.name} has ${
+          action.type === "ROOM_MEMBER_JOIN" ? "joined" : "left"
+        } the game.`,
+        style: "font-semibold",
+      };
+
       return {
         ...state,
         players: action.payload.players,
+        messages: [...state.messages, message],
+        status: action.payload.status || state.status,
+        word: action.payload.word || state.word,
       };
     case "CHAT_PUBLIC_CLIENT_MESSAGE":
     case "CHAT_PUBLIC_SERVER_MESSAGE":

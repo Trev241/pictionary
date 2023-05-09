@@ -9,8 +9,8 @@ class Room {
   static maxConnections = 5;
 
   // Game states
-  static GAME_WAITING = 0;
-  static GAME_ONGOING = 1;
+  static GAME_WAITING = "GAME_WAITING";
+  static GAME_ONGOING = "GAME_ONGOING";
 
   constructor() {
     this.id = Math.floor(Math.random() * 500);
@@ -22,6 +22,7 @@ class Room {
     this.maxRounds = 3;
     this.round = 0;
     this.roundTime = 10;
+    this.deadline = 0;
     this.word = getRandomWord();
     this.gameState = Room.GAME_WAITING;
     this.timeoutId = null;
@@ -47,27 +48,40 @@ class Room {
     // Notify join
     this.broadcast({
       type: "ROOM_MEMBER_JOIN",
-      players: this.players.map((player) => ({
+      player: { name: ws.handle },
+      players: this.players.map((player, idx) => ({
         name: player.handle,
         score: player.score,
-        state: this.gameState,
+        isDrawing: this.drawerIndex === idx,
       })),
+      status: this.gameState,
+      word: this.word,
+      deadline: this.deadline,
     });
   }
 
   leave(ws) {
+    const playerIdx = this.players.indexOf(ws);
+    this.players.splice(playerIdx, 1);
     this.connections.delete(ws);
-    this.players.splice(this.players.indexOf(ws), 1);
     ws.roomId = undefined;
 
     // Notify leave
     this.broadcast({
       type: "ROOM_MEMBER_LEAVE",
+      player: { name: ws.handle },
       players: this.players.map((player, idx) => ({
         name: player.handle,
         score: player.score,
+        isDrawing: this.drawerIndex === idx,
       })),
     });
+
+    // Prevent next player's turn from getting skipped if the player who left was drawing
+    if (playerIdx === this.drawerIndex) {
+      this.drawerIndex--;
+      this.nextTurn();
+    }
   }
 
   nextTurn() {
@@ -81,22 +95,29 @@ class Room {
       );
 
     // Go to next turn or round or conclude game
-    this.drawerIndex = (this.drawerIndex + 1) % this.players.length;
-    if (this.drawerIndex === 0 && ++this.round >= this.maxRounds) {
+    // this.drawerIndex = (this.drawerIndex + 1) % this.players.length;
+    this.drawerIndex++;
+    if (this.drawerIndex === this.players.length) {
+      this.round++; // Advance round if last player has finished their turn
+      this.drawerIndex %= this.players.length; // Cycle turn back to first player
+    }
+
+    // Conclude the game if all rounds are over or if only one player is left
+    if (this.players.length === 1 || this.round >= this.maxRounds) {
       this.finish();
       return;
     } else this.timeoutId = setTimeout(this.nextTurn, this.roundTime * 1000);
 
     // Next word
     const currentTime = Date.now();
-    const deadline =
+    this.deadline =
       currentTime + (1000 - (currentTime % 1000)) + this.roundTime * 1000;
 
     this.word = getRandomWord();
     this.broadcast({
       type: "GAME_NEXT_WORD",
       word: this.word,
-      deadline: deadline,
+      deadline: this.deadline,
       drawer: this.drawerIndex,
       round: this.round,
     });
@@ -129,7 +150,8 @@ class Room {
   finish() {
     // Rest for next game
     this.gameState = Room.GAME_WAITING;
-    this.round = this.drawerIndex = -1;
+    this.drawerIndex = -1;
+    this.round = 0;
     this.completed.clear();
 
     this.broadcast({ type: "GAME_END" });

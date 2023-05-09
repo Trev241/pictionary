@@ -55,6 +55,7 @@ function Game() {
     if (readyState !== WebSocket.OPEN || !lastJsonMessage) return;
 
     switch (lastJsonMessage.type) {
+      case "ROOM_MEMBER_JOIN":
       case "GAME_NEXT_WORD":
         dispatch({
           type: lastJsonMessage.type,
@@ -68,7 +69,6 @@ function Game() {
       case "GAME_END":
       case "GAME_START_TURN":
       case "GAME_END_TURN":
-      case "ROOM_MEMBER_JOIN":
       case "ROOM_MEMBER_LEAVE":
         dispatch({
           type: lastJsonMessage.type,

@@ -10,11 +10,12 @@ function Sky({ starCount }) {
     const radius = Math.random() * 0.25;
     const x = Math.floor(Math.random() * (95 - 5) + 5);
     const y = Math.floor(Math.random() * (85 - 5) + 5);
-    const twinkleDuration = Math.random() * (3.5 - 0.5) + 0.5;
+    const twinkleDuration = Math.random() * (1 - 0.5) + 0.5;
     const lowestOpacity = Math.random() * 1;
 
     stars.push(
       <Star
+        key={i}
         radius={radius + "rem"}
         x={x + "%"}
         y={y + "%"}
