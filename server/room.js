@@ -84,10 +84,18 @@ class Room {
     } else setTimeout(this.nextTurn, this.roundTime * 1000);
 
     // Next word
+    const currentTime = Date.now();
+    const deadline =
+      currentTime + (1000 - (currentTime % 1000)) + this.roundTime * 1000;
+
+    console.log(deadline);
+    console.log(Date.now() + this.roundTime * 1000);
+
     this.word = getRandomWord();
     this.broadcast({
       type: "GAME_NEXT_WORD",
       word: this.word,
+      deadline: deadline,
       drawer: this.drawerIndex,
     });
 

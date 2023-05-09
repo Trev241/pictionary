@@ -6,6 +6,7 @@ import { UserContext } from "../components/UserProvider";
 import "./Game.css";
 import Canvas from "../components/Canvas";
 import Modal from "../components/Modal";
+import useTimer from "../hooks/useTimer";
 
 function Game() {
   const [messages, setMessages] = useState([]);
@@ -19,6 +20,7 @@ function Game() {
   const navigate = useNavigate();
 
   const { user } = useContext(UserContext);
+  const { seconds, setDeadline } = useTimer(Date.now());
   const { lastJsonMessage, readyState, sendJsonMessage } = useWebSocket(
     "ws://localhost:8080",
     {
@@ -77,6 +79,9 @@ function Game() {
           players[lastJsonMessage.drawer].isDrawing = true;
           return players;
         });
+        // setTimer(lastJsonMessage.time);
+        // startTimer();
+        setDeadline(lastJsonMessage.deadline);
         break;
       case "GAME_START":
         setGameState("GAME_ONGOING");
@@ -101,7 +106,7 @@ function Game() {
         console.warn(`Received unknown message type ${lastJsonMessage.type}`);
         break;
     }
-  }, [lastJsonMessage, readyState, navigate]);
+  }, [lastJsonMessage, readyState, navigate, setDeadline]);
 
   // Send a message to the server when the form is submitted
   const handleSubmit = (event) => {
@@ -143,7 +148,7 @@ function Game() {
                 </span>{" "}
                 is now drawing
               </h1>
-              <h1 className="my-auto ms-auto tracking-widest">00:00</h1>
+              <h1 className="my-auto ms-auto tracking-widest">{seconds}</h1>
             </div>
           </div>
           <Canvas enabled={isDrawing} />

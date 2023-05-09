@@ -1,0 +1,26 @@
+.star {
+  position: absolute;
+  width: var(--radius);
+  height: var(--radius);
+  left: var(--x);
+  bottom: var(--y);
+
+  background-color: white;
+  border-radius: var(--radius);
+
+  will-change: opacity;
+
+  animation: twinkle var(--twinkle-duration) linear 0s infinite alternate;
+}
+
+/* @keyframes x {
+  to {
+    left: calc(100vw - var(--radius) - 10px);
+  }
+} */
+
+@keyframes twinkle {
+  to {
+    opacity: 0.25;
+  }
+}
