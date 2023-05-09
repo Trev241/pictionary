@@ -21,6 +21,6 @@
 
 @keyframes twinkle {
   to {
-    opacity: 0.25;
+    opacity: var(--lowest-opacity);
   }
 }

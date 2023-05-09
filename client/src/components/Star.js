@@ -1,4 +1,4 @@
-function Star({ radius, x, y, twinkleDuration }) {
+function Star({ radius, x, y, twinkleDuration, lowestOpacity }) {
   return (
     <div
       className="star"
@@ -8,6 +8,7 @@ function Star({ radius, x, y, twinkleDuration }) {
         "--y": y,
         // "--travel-duration": travelDuration,
         "--twinkle-duration": twinkleDuration,
+        "--lowest-opacity": lowestOpacity,
       }}
     />
   );

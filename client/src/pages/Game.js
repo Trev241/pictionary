@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useReducer } from "react";
 import { useWebSocket } from "react-use-websocket/dist/lib/use-websocket";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
@@ -7,14 +7,10 @@ import "./Game.css";
 import Canvas from "../components/Canvas";
 import Modal from "../components/Modal";
 import useTimer from "../hooks/useTimer";
+import { INITIAL_STATE, gameReducer } from "../reducers/gameReducer";
 
 function Game() {
-  const [messages, setMessages] = useState([]);
-  const [inputValue, setInputValue] = useState("");
-  const [word, setWord] = useState("");
-  const [gameState, setGameState] = useState("GAME_WAITING");
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [players, setPlayers] = useState([]);
+  const [state, dispatch] = useReducer(gameReducer, INITIAL_STATE);
 
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -59,48 +55,28 @@ function Game() {
     if (readyState !== WebSocket.OPEN || !lastJsonMessage) return;
 
     switch (lastJsonMessage.type) {
-      case "CHAT_PUBLIC_SERVER_MESSAGE":
-        setMessages((messages) => [
-          ...messages,
-          { ...lastJsonMessage, style: "font-semibold" },
-        ]);
-        break;
-      case "CHAT_PUBLIC_CLIENT_MESSAGE":
-        setMessages((messages) => [...messages, lastJsonMessage]);
-        break;
       case "GAME_NEXT_WORD":
-        setWord(lastJsonMessage.word);
-        setMessages((messages) => [
-          ...messages,
-          { text: "A new word has been chosen." },
-        ]);
-        setPlayers((players) => {
-          players.forEach((player) => (player.isDrawing = false));
-          players[lastJsonMessage.drawer].isDrawing = true;
-          return players;
+        dispatch({
+          type: lastJsonMessage.type,
+          payload: lastJsonMessage,
         });
-        // setTimer(lastJsonMessage.time);
-        // startTimer();
         setDeadline(lastJsonMessage.deadline);
         break;
+      case "CHAT_PUBLIC_SERVER_MESSAGE":
+      case "CHAT_PUBLIC_CLIENT_MESSAGE":
       case "GAME_START":
-        setGameState("GAME_ONGOING");
-        break;
       case "GAME_END":
-        setGameState("GAME_WAITING");
+      case "GAME_START_TURN":
+      case "GAME_END_TURN":
+      case "ROOM_MEMBER_JOIN":
+      case "ROOM_MEMBER_LEAVE":
+        dispatch({
+          type: lastJsonMessage.type,
+          payload: lastJsonMessage,
+        });
         break;
       case "ROOM_JOIN_FAILURE":
         navigate("/error");
-        break;
-      case "GAME_START_TURN":
-        setIsDrawing(true);
-        break;
-      case "GAME_END_TURN":
-        setIsDrawing(false);
-        break;
-      case "ROOM_MEMBER_JOIN":
-      case "ROOM_MEMBER_LEAVE":
-        setPlayers(lastJsonMessage.players);
         break;
       default:
         console.warn(`Received unknown message type ${lastJsonMessage.type}`);
@@ -114,10 +90,11 @@ function Game() {
     const message = {
       sender: user,
       type: "CHAT_PUBLIC_CLIENT_MESSAGE",
-      text: inputValue,
+      text: state.inputMessage,
     };
     sendJsonMessage(message);
-    setInputValue("");
+    // setInputValue("");
+    dispatch({ type: "CHAT_TYPE_MESSAGE", payload: "" });
   };
 
   const handleStart = () => {
@@ -131,21 +108,21 @@ function Game() {
         <div className="relative z-0">
           <div className="flex gap-4 mb-4">
             <div className="bg-amber-100 dark:bg-gray-900 p-4 text-center rounded-s-2xl flex-grow">
-              <h1 className="text-center flex-grow">Round: 1</h1>
+              <h1 className="text-center flex-grow">Round {state.round + 1}</h1>
               <h1 className="text-4xl mb-3 text-center font-bold tracking-widest">
-                {gameState === "GAME_WAITING"
+                {state.status === "GAME_WAITING"
                   ? "WAITING FOR PLAYERS"
-                  : isDrawing
-                  ? word.toUpperCase()
-                  : word
+                  : state.isDrawing
+                  ? state.word.toUpperCase()
+                  : state.word
                       .split("")
                       .map(() => "_")
                       .join("")}
               </h1>
               <h1>
                 <span className="font-semibold">
-                  {players.filter((player) => player.isDrawing)[0]?.name ||
-                    "No one"}
+                  {state.players.filter((player) => player.isDrawing)[0]
+                    ?.name || "No one"}
                 </span>{" "}
                 is now drawing
               </h1>
@@ -155,8 +132,8 @@ function Game() {
               {seconds}
             </div>
           </div>
-          <Canvas enabled={isDrawing} />
-          {gameState === "GAME_WAITING" && (
+          <Canvas enabled={state.isDrawing} />
+          {state.status === "GAME_WAITING" && (
             <div className="absolute inset-0 flex justify-center items-center rounded-2xl bg-black bg-opacity-60 z-50">
               <button
                 className="bg-green-600 hover:bg-green-500 p-4 px-12 text-2xl tracking-widest rounded-2xl text-white"
@@ -168,7 +145,7 @@ function Game() {
           )}
         </div>
         <div className="flex gap-1 flex-wrap mt-8">
-          {players.map((player, idx) => (
+          {state.players.map((player, idx) => (
             <div
               key={idx}
               className={`w-44 bg-amber-300 dark:bg-gray-900 p-4 rounded-2xl flex-grow flex items-center shadow-md ${
@@ -189,7 +166,7 @@ function Game() {
         <div className="flex flex-col flex-1 justify-end h-screen max-h-screen max-lg:max-h-96 max-w-full overflow-y-auto bg-amber-100 dark:bg-gray-900 m-3 rounded shadow-md">
           <div className="overflow-y-auto max-h-full px-3 my-4">
             <ul className="flex flex-col justify-end">
-              {messages.map((message, idx) => (
+              {state.messages.map((message, idx) => (
                 <li
                   key={idx}
                   className={`flex break-words ${message.style} ${
@@ -211,8 +188,10 @@ function Game() {
             <input
               className="border border-gray-500 rounded p-2 w-full max-w-full dark:bg-gray-700 dark:border-gray-800 focus:outline-none"
               type="text"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
+              value={state.inputMessage}
+              onChange={(e) =>
+                dispatch({ type: "CHAT_TYPE_MESSAGE", payload: e.target.value })
+              }
               placeholder="Type a message..."
             />
           </form>
