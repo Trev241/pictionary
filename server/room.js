@@ -97,6 +97,7 @@ class Room {
       word: this.word,
       deadline: deadline,
       drawer: this.drawerIndex,
+      round: this.round,
     });
 
     // Notify next player that their turn has begun
