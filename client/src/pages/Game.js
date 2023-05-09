@@ -129,26 +129,30 @@ function Game() {
       {!user && <Modal />}
       <div className="lg:col-span-9 max-lg:col-span-12 flex flex-col justify-center p-3">
         <div className="relative z-0">
-          <div className="bg-amber-100 dark:bg-gray-900 p-4 rounded-t-2xl">
-            <h1 className="text-3xl text-center font-bold tracking-widest">
-              {gameState === "GAME_WAITING"
-                ? "WAITING FOR PLAYERS"
-                : isDrawing
-                ? word.toUpperCase()
-                : word
-                    .split("")
-                    .map(() => "_")
-                    .join("")}
-            </h1>
-            <div className="grid grid-cols-2 mb-3">
-              <h1 className="my-auto">
+          <div className="flex gap-4 mb-4">
+            <div className="bg-amber-100 dark:bg-gray-900 p-4 text-center rounded-s-2xl flex-grow">
+              <h1 className="text-center flex-grow">Round: 1</h1>
+              <h1 className="text-4xl mb-3 text-center font-bold tracking-widest">
+                {gameState === "GAME_WAITING"
+                  ? "WAITING FOR PLAYERS"
+                  : isDrawing
+                  ? word.toUpperCase()
+                  : word
+                      .split("")
+                      .map(() => "_")
+                      .join("")}
+              </h1>
+              <h1>
                 <span className="font-semibold">
                   {players.filter((player) => player.isDrawing)[0]?.name ||
                     "No one"}
                 </span>{" "}
                 is now drawing
               </h1>
-              <h1 className="my-auto ms-auto tracking-widest">{seconds}</h1>
+            </div>
+
+            <div className="flex justify-center items-center w-40 p-4 text-6xl bg-amber-100 dark:bg-gray-900 rounded-e-2xl">
+              {seconds}
             </div>
           </div>
           <Canvas enabled={isDrawing} />
@@ -163,11 +167,11 @@ function Game() {
             </div>
           )}
         </div>
-        <div className="flex flex-wrap mt-8">
+        <div className="flex gap-1 flex-wrap mt-8">
           {players.map((player, idx) => (
             <div
               key={idx}
-              className={`w-44 bg-amber-300 dark:bg-gray-900 p-4 rounded-2xl m-1 flex-grow flex items-center shadow-md ${
+              className={`w-44 bg-amber-300 dark:bg-gray-900 p-4 rounded-2xl flex-grow flex items-center shadow-md ${
                 player.isDrawing && "bg-amber-500 dark:bg-green-600"
               }`}
               style={{ flexBasis: idx < 3 ? "30%" : "auto" }}

@@ -121,7 +121,7 @@ function Canvas({ aspectRatio, enabled }) {
   }, [lastJsonMessage, canvasRef]);
 
   return (
-    <div className="bg-amber-100 dark:bg-gray-900 p-4 rounded-b-2xl shadow-lg">
+    <div className="bg-amber-100 dark:bg-gray-900 p-4 rounded-2xl shadow-lg">
       <div id="canvas-container" className="mb-2">
         <canvas ref={ref} className="border border-gray-500 rounded-2xl" />
       </div>
