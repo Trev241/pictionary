@@ -24,6 +24,7 @@ class Room {
     this.roundTime = 10;
     this.word = getRandomWord();
     this.gameState = Room.GAME_WAITING;
+    this.timeoutId = null;
 
     // Bind methods
     this.join = this.join.bind(this);
@@ -70,6 +71,9 @@ class Room {
   }
 
   nextTurn() {
+    // Clear previous round timer
+    clearTimeout(this.timeoutId);
+
     // Notify previous player that their turn has ended
     if (this.drawerIndex >= 0)
       this.players[this.drawerIndex].send(
@@ -81,7 +85,7 @@ class Room {
     if (this.drawerIndex === 0 && ++this.round >= this.maxRounds) {
       this.finish();
       return;
-    } else setTimeout(this.nextTurn, this.roundTime * 1000);
+    } else this.timeoutId = setTimeout(this.nextTurn, this.roundTime * 1000);
 
     // Next word
     const currentTime = Date.now();
