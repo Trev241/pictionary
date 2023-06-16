@@ -1,4 +1,4 @@
-import { useContext, useEffect, useReducer } from "react";
+import { useContext, useEffect, useReducer, useRef } from "react";
 import { useWebSocket } from "react-use-websocket/dist/lib/use-websocket";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
@@ -14,6 +14,7 @@ function Game() {
 
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const chatRef = useRef();
 
   const { user } = useContext(UserContext);
   const { seconds, setDeadline } = useTimer(Date.now());
@@ -97,6 +98,11 @@ function Game() {
     dispatch({ type: "CHAT_TYPE_MESSAGE", payload: "" });
   };
 
+  useEffect(() => {
+    if (chatRef.current)
+      chatRef.current.scrollTo(0, chatRef.current.scrollHeight);
+  }, [state.messages]);
+
   const handleStart = () => {
     sendJsonMessage({ type: "GAME_REQUEST_START" });
   };
@@ -164,7 +170,7 @@ function Game() {
 
       <div className="lg:col-span-3 max-lg:col-span-12 flex">
         <div className="flex flex-col flex-1 justify-end h-screen max-h-screen max-lg:max-h-96 max-w-full overflow-y-auto bg-amber-100 dark:bg-gray-900 m-3 rounded shadow-md">
-          <div className="overflow-y-auto max-h-full px-3 my-4">
+          <div ref={chatRef} className="overflow-y-auto max-h-full px-3 my-4">
             <ul className="flex flex-col justify-end">
               {state.messages.map((message, idx) => (
                 <li

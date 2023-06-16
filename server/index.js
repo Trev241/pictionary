@@ -64,7 +64,16 @@ wss.on("connection", (ws) => {
     console.log(
       `Client disconnected. Existing connections: ${wss.clients.size}`
     );
-    if (ws.roomId && rooms[ws.roomId]) rooms[ws.roomId].leave(ws);
+    if (ws.roomId && rooms[ws.roomId]) {
+      const room = rooms[ws.roomId];
+      room.leave(ws);
+
+      // Destroy room if no players are left
+      if (room.connections.size <= 0) {
+        room = null;
+        console.log(`Destroyed room ${ws.roomId}`);
+      }
+    }
   });
 });
 

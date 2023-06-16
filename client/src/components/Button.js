@@ -9,7 +9,7 @@ function Button({ children, onClickCallback, customStyle, disabled }) {
         customStyle ||
         `bg-gray-950 rounded shadow-sm p-3 hover:bg-gray-800 dark:bg-gray-700 dark:text-white ${
           disabled
-            ? "bg-amber-500 hover:bg-amber-500 hover:cursor-auto text-gray-300"
+            ? "bg-gray-500 hover:bg-gray-500 hover:cursor-auto text-gray-300"
             : "dark:hover:bg-gray-600 hover:cursor-pointer"
         }`
       }
