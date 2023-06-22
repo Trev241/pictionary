@@ -34,6 +34,13 @@ class Room {
     this.finish = this.finish.bind(this);
     this.nextTurn = this.nextTurn.bind(this);
     this.broadcast = this.broadcast.bind(this);
+    this.appointHost = this.appointHost.bind(this);
+  }
+
+  appointHost() {
+    // Appoint the first player as the room's host
+    if (this.players.length > 0)
+      this.players[0].send(JSON.stringify({ type: "ROOM_APPOINT_AS_HOST" }));
   }
 
   join(ws) {
@@ -58,6 +65,8 @@ class Room {
       word: this.word,
       deadline: this.deadline,
     });
+
+    this.appointHost();
   }
 
   leave(ws) {
@@ -82,6 +91,8 @@ class Room {
       this.drawerIndex--;
       this.nextTurn();
     }
+
+    this.appointHost();
   }
 
   nextTurn() {

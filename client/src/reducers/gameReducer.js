@@ -8,9 +8,12 @@ const INITIAL_STATE = {
   round: 1,
   rounds: 3,
   roundTime: 30,
+  isHost: false,
 };
 
 function gameReducer(state, action) {
+  let message;
+
   switch (action.type) {
     case "GAME_START":
     case "GAME_END":
@@ -38,7 +41,7 @@ function gameReducer(state, action) {
       };
     case "ROOM_MEMBER_JOIN":
     case "ROOM_MEMBER_LEAVE":
-      const message = {
+      message = {
         text: `${action.payload.player.name} has ${
           action.type === "ROOM_MEMBER_JOIN" ? "joined" : "left"
         } the game.`,
@@ -75,6 +78,11 @@ function gameReducer(state, action) {
       return {
         ...state,
         roundTime: action.payload,
+      };
+    case "ROOM_APPOINT_AS_HOST":
+      return {
+        ...state,
+        isHost: true,
       };
     default:
       return state;
