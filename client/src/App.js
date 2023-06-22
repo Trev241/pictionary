@@ -10,7 +10,7 @@ import NavigationBar from "./components/NavigationBar";
 import Sky from "./components/Sky";
 
 function App() {
-  useWebSocket("ws://localhost:8080", {
+  useWebSocket(process.env.REACT_APP_WEBSOCKET_URL, {
     onOpen: () => {
       console.log("Connection established");
     },
