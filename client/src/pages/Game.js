@@ -104,7 +104,11 @@ function Game() {
   }, [state.messages]);
 
   const handleStart = () => {
-    sendJsonMessage({ type: "GAME_REQUEST_START" });
+    sendJsonMessage({
+      type: "GAME_REQUEST_START",
+      rounds: state.rounds,
+      roundTime: state.roundTime,
+    });
   };
 
   return (
@@ -138,17 +142,63 @@ function Game() {
               {seconds}
             </div>
           </div>
-          <Canvas enabled={state.isDrawing} />
-          {state.status === "GAME_WAITING" && (
-            <div className="absolute inset-0 flex justify-center items-center rounded-2xl bg-black bg-opacity-60 z-50">
-              <button
-                className="bg-green-600 hover:bg-green-500 p-4 px-12 text-2xl tracking-widest rounded-2xl text-white"
-                onClick={handleStart}
-              >
-                START GAME
-              </button>
-            </div>
-          )}
+          <div className="relative z-0">
+            <Canvas enabled={state.isDrawing} />
+            {state.status === "GAME_WAITING" && (
+              <div className="absolute inset-0 flex justify-center items-center rounded-2xl bg-gray-800 dark:bg-black bg-opacity-30 dark:bg-opacity-60 z-50">
+                <div className="flex flex-col bg-amber-200 dark:bg-gray-900 rounded-lg p-8 shadow-xl">
+                  <h1 className="text-3xl mb-6 font-semibold">Room Settings</h1>
+
+                  <div className="flex w-96 justify-between gap-4 mb-2">
+                    <h1>Number of rounds</h1>
+                    <select
+                      className="p-1 rounded dark:bg-gray-800"
+                      value={state.rounds}
+                      onChange={(e) =>
+                        dispatch({
+                          type: "CHANGE_NUMBER_OF_ROUNDS",
+                          payload: e.target.value,
+                        })
+                      }
+                    >
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((val) => (
+                        <option key={val} value={val}>
+                          {val}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="flex w-96 justify-between gap-4 mb-4">
+                    <h1>Time per round (seconds)</h1>
+                    <select
+                      className="rounded p-1 dark:bg-gray-800"
+                      value={state.roundTime}
+                      onChange={(e) =>
+                        dispatch({
+                          type: "CHANGE_ROUND_TIME",
+                          payload: e.target.value,
+                        })
+                      }
+                    >
+                      {[10, 15, 30, 45, 60, 120, 180].map((val) => (
+                        <option key={val} value={val}>
+                          {val}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <button
+                    className="bg-green-600 hover:bg-green-500 px-8 py-2 text-2xl rounded-lg text-white"
+                    onClick={handleStart}
+                  >
+                    Start
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
         <div className="flex gap-1 flex-wrap mt-8">
           {state.players.map((player, idx) => (

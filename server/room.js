@@ -64,7 +64,7 @@ class Room {
     const playerIdx = this.players.indexOf(ws);
     this.players.splice(playerIdx, 1);
     this.connections.delete(ws);
-    ws.roomId = undefined;
+    ws.roomId = null;
 
     // Notify leave
     this.broadcast({
@@ -191,6 +191,8 @@ class Room {
         break;
 
       case "GAME_REQUEST_START":
+        this.maxRounds = Math.min(10, Math.max(1, message.rounds));
+        this.roundTime = Math.min(180, Math.max(10, message.roundTime));
         this.start();
         break;
 

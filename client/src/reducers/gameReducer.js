@@ -6,6 +6,8 @@ const INITIAL_STATE = {
   isDrawing: false,
   players: [],
   round: 1,
+  rounds: 3,
+  roundTime: 30,
 };
 
 function gameReducer(state, action) {
@@ -63,6 +65,16 @@ function gameReducer(state, action) {
       return {
         ...state,
         inputMessage: action.payload,
+      };
+    case "CHANGE_NUMBER_OF_ROUNDS":
+      return {
+        ...state,
+        rounds: action.payload,
+      };
+    case "CHANGE_ROUND_TIME":
+      return {
+        ...state,
+        roundTime: action.payload,
       };
     default:
       return state;

@@ -4,6 +4,7 @@
   height: var(--radius);
   left: var(--x);
   bottom: var(--y);
+  z-index: 0;
 
   background-color: white;
   border-radius: var(--radius);

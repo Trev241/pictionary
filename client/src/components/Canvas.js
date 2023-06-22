@@ -133,6 +133,7 @@ function Canvas({ aspectRatio, enabled }) {
           <div className="flex flex-wrap mb-2">
             {Object.keys(colors).map((className, idx) => (
               <button
+                key={idx}
                 className={`rounded p-5 border border-gray-600 dark:border-gray-900 hover:rounded-xl ${className}`}
                 onClick={() =>
                   (canvasRef.current.freeDrawingBrush.color = colors[className])

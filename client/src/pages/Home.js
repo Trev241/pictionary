@@ -33,39 +33,32 @@ function Home() {
     }
   }, [lastJsonMessage, navigate]);
 
-  const handleCreate = async () => {
+  const handleCreate = async (e) => {
     // ws.current.send(JSON.stringify({ type: "ROOM_CREATE" }));
+    e.preventDefault();
     sendJsonMessage({ type: "ROOM_CREATE" });
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
-      <div>
-        <h1 className="text-3xl font-bold mb-12">
-          What name would you like to go by?
-        </h1>
+    <div className="flex justify-center items-center min-h-screen p-8">
+      <div className="z-10">
+        <h1 className="text-5xl mb-3">Ready to play?</h1>
+        <h2 className="text-xl mb-6">
+          What would you like others to know you as?
+        </h2>
 
-        <div className="flex flex-col">
+        <form onSubmit={handleCreate} className="flex flex-col">
           <input
-            className="mb-8 text-center block w-full p-4 border border-gray-500 rounded dark:text-black"
+            className="mb-2 text-center p-2 border border-gray-500 rounded dark:bg-gray-700"
             type="text"
             value={user}
-            placeholder="cool quirky name"
+            placeholder="captain cool"
             onChange={(e) => setUser(e.target.value)}
           />
-          <button
-            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mb-2"
-            onClick={handleCreate}
-          >
+          <button className="bg-blue-500 hover:bg-blue-700 p-3 rounded">
             Create Room
           </button>
-          {/* <button 
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            onClick={handleJoin}
-          >
-            Join
-          </button> */}
-        </div>
+        </form>
       </div>
     </div>
   );
