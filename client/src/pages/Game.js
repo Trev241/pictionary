@@ -68,6 +68,7 @@ function Game() {
       case "CHAT_PUBLIC_CLIENT_MESSAGE":
       case "GAME_START":
       case "GAME_END":
+      case "GAME_SUCCESSFUL_GUESS":
       case "GAME_START_TURN":
       case "GAME_END_TURN":
       case "ROOM_MEMBER_LEAVE":

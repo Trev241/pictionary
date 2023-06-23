@@ -178,9 +178,25 @@ class Room {
         ) {
           // Client guessed the word
           this.completed.add(ws);
+
+          // Update client's score based on remaining time left
+          const roundTimeMs = this.roundTime * 1000;
+          const startTime = this.deadline - roundTimeMs;
+          const points = Math.round(
+            (100.0 * (roundTimeMs - Date.now() + startTime)) / roundTimeMs
+          );
+
+          const player = this.players.find((player) => ws === player);
+          player.score = (player.score || 0) + points;
+
+          // Broadcast scores
           this.broadcast({
-            type: "CHAT_PUBLIC_SERVER_MESSAGE",
-            text: `${message.sender} guessed the word!`,
+            type: "GAME_SUCCESSFUL_GUESS",
+            players: this.players.map((player, idx) => ({
+              name: player.handle,
+              score: player.score,
+              isDrawing: this.drawerIndex === idx,
+            })),
           });
 
           // Check if everyone has guessed

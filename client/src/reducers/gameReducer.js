@@ -5,7 +5,7 @@ const INITIAL_STATE = {
   status: "GAME_WAITING",
   isDrawing: false,
   players: [],
-  round: 1,
+  round: 0,
   rounds: 3,
   roundTime: 30,
   isHost: false,
@@ -83,6 +83,11 @@ function gameReducer(state, action) {
       return {
         ...state,
         isHost: true,
+      };
+    case "GAME_SUCCESSFUL_GUESS":
+      return {
+        ...state,
+        players: action.payload.players,
       };
     default:
       return state;
