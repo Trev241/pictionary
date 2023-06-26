@@ -7,7 +7,7 @@ import { UserContext } from "../components/UserProvider";
 function Home() {
   const { user, setUser } = useContext(UserContext);
   const { lastJsonMessage, sendJsonMessage } = useWebSocket(
-    "ws://localhost:8080",
+    process.env.REACT_APP_WEBSOCKET_URL,
     {
       share: true,
     }

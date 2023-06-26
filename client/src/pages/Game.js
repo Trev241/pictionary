@@ -19,7 +19,7 @@ function Game() {
   const { user } = useContext(UserContext);
   const { seconds, setDeadline } = useTimer(Date.now());
   const { lastJsonMessage, readyState, sendJsonMessage } = useWebSocket(
-    "ws://localhost:8080",
+    process.env.REACT_APP_WEBSOCKET_URL,
     {
       share: true,
     }
