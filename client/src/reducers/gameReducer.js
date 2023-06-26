@@ -20,6 +20,7 @@ function gameReducer(state, action) {
       return {
         ...state,
         status: action.type === "GAME_START" ? "GAME_ONGOING" : "GAME_WAITING",
+        players: action.payload.players || state.players,
       };
     case "GAME_NEXT_WORD":
       const _players = state.players;
@@ -85,9 +86,15 @@ function gameReducer(state, action) {
         isHost: true,
       };
     case "GAME_SUCCESSFUL_GUESS":
+      message = {
+        text: `${action.payload.guesser} guessed the word!`,
+        style: "font-semibold",
+      };
+
       return {
         ...state,
         players: action.payload.players,
+        messages: [...state.messages, message],
       };
     default:
       return state;

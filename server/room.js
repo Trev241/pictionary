@@ -152,10 +152,20 @@ class Room {
       return;
     }
 
+    // Reset scores
+    for (let i = 0; i < this.players.length; i++) this.players[i].score = 0;
+
     this.gameState = Room.GAME_ONGOING;
     this.nextTurn();
 
-    this.broadcast({ type: "GAME_START" });
+    this.broadcast({
+      type: "GAME_START",
+      players: this.players.map((player, idx) => ({
+        name: player.handle,
+        score: player.score,
+        isDrawing: this.drawerIndex === idx,
+      })),
+    });
   }
 
   finish() {
@@ -172,7 +182,7 @@ class Room {
     switch (message.type) {
       case "CHAT_PUBLIC_CLIENT_MESSAGE":
         if (
-          message.text === this.word &&
+          message.text.toUpperCase() === this.word.toUpperCase() &&
           !this.completed.has(ws) &&
           this.gameState === Room.GAME_ONGOING
         ) {
@@ -192,6 +202,7 @@ class Room {
           // Broadcast scores
           this.broadcast({
             type: "GAME_SUCCESSFUL_GUESS",
+            guesser: ws.handle,
             players: this.players.map((player, idx) => ({
               name: player.handle,
               score: player.score,
