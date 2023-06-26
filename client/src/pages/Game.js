@@ -121,14 +121,14 @@ function Game() {
           <div className="flex gap-4 mb-4">
             <div className="bg-amber-100 dark:bg-gray-900 p-4 text-center rounded-s-2xl flex-grow">
               <h1 className="text-center flex-grow">Round {state.round + 1}</h1>
-              <h1 className="text-4xl mb-3 text-center font-bold tracking-widest">
+              <h1 className="text-4xl mb-3 text-center font-bold tracking-widest font-mono">
                 {state.status === "GAME_WAITING"
                   ? "WAITING FOR PLAYERS"
                   : state.isDrawing
                   ? state.word.toUpperCase()
                   : state.word
                       .split("")
-                      .map(() => "_")
+                      .map((ch) => (ch !== " " ? "_" : " "))
                       .join("")}
               </h1>
               <h1>
