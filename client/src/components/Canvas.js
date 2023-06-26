@@ -7,7 +7,7 @@ import { fabric } from "fabric";
 function Canvas({ aspectRatio, enabled }) {
   const canvasRef = useRef(null);
   const { lastJsonMessage, sendJsonMessage } = useWebSocket(
-    "ws://localhost:8080",
+    process.env.REACT_APP_WEBSOCKET_URL,
     {
       share: true,
     }
